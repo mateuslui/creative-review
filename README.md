@@ -5,32 +5,66 @@ transcrição com timestamp, leitura cena a cena, leitura estratégica e o "como
 
 ## Instalação
 
-1. Copie esta pasta para `~/.claude/skills/creative-review` (Mac/Linux) ou `%USERPROFILE%\.claude\skills\creative-review` (Windows).
+Precisa do **Claude Code** instalado no computador. A skill roda comando local (ffmpeg, Whisper) e lê arquivo
+no disco, então não funciona no Claude do navegador nem no app de celular.
 
-2. Instale o ffmpeg:
-
-```bash
-brew install ffmpeg          # Mac
-sudo apt install ffmpeg      # Linux
-winget install ffmpeg        # Windows
-```
-
-3. Crie o ambiente Python da skill:
+### Mac
 
 ```bash
-python3 -m venv ~/.claude/skills/creative-review/.venv
-~/.claude/skills/creative-review/.venv/bin/pip install faster-whisper pillow
+git clone https://github.com/mateuslui/creative-review.git ~/.claude/skills/creative-review
 ```
-
-No Windows, troque `bin/pip` por `Scripts\pip`.
-
-4. Teste:
 
 ```bash
-~/.claude/skills/creative-review/.venv/bin/python ~/.claude/skills/creative-review/scripts/prepare.py <video.mp4> --out ~/Downloads/creative-review/teste
+brew install ffmpeg
 ```
+
+```bash
+cd ~/.claude/skills/creative-review && python3 -m venv .venv && .venv/bin/pip install faster-whisper pillow
+```
+
+Se o `brew` não existir, instale o Homebrew primeiro em https://brew.sh.
+
+### Windows (PowerShell)
+
+```powershell
+winget install Git.Git ; winget install Python.Python.3.12 ; winget install Gyan.FFmpeg
+```
+
+Feche e abra o PowerShell depois dessa linha, para o PATH atualizar.
+
+```powershell
+git clone https://github.com/mateuslui/creative-review.git "$env:USERPROFILE\.claude\skills\creative-review"
+```
+
+```powershell
+cd "$env:USERPROFILE\.claude\skills\creative-review" ; python -m venv .venv ; .venv\Scripts\pip install faster-whisper pillow
+```
+
+### Linux
+
+```bash
+git clone https://github.com/mateuslui/creative-review.git ~/.claude/skills/creative-review
+sudo apt install ffmpeg
+cd ~/.claude/skills/creative-review && python3 -m venv .venv && .venv/bin/pip install faster-whisper pillow
+```
+
+### Depois de instalar
+
+Reinicie o Claude Code. A skill aparece como `/creative-review`.
 
 Na primeira execução o modelo de transcrição (`small`, cerca de 500MB) é baixado automaticamente.
+
+## Atualizar
+
+```bash
+cd ~/.claude/skills/creative-review && git pull
+```
+
+No Windows:
+
+```powershell
+cd "$env:USERPROFILE\.claude\skills\creative-review" ; git pull
+```
 
 ## Uso
 

@@ -30,6 +30,8 @@ Você não assiste vídeo. Você lê: **transcrição local + quadros com timest
 
 - Python: usa o venv da própria skill (`~/.claude/skills/creative-review/.venv`), com faster-whisper + Pillow.
   Se não existir, siga o README: `python3 -m venv .venv && .venv/bin/pip install faster-whisper pillow`. Requer ffmpeg no PATH.
+- Windows: o caminho é `%USERPROFILE%\.claude\skills\creative-review\.venv\Scripts\python.exe` e o script é
+  `...\scripts\prepare.py`. Mesmos argumentos.
 - Saída padrão: `~/Downloads/creative-review/<AAAA-MM-DD>-<nome-do-lote>/`, salvo se o usuário indicar outra.
 - Links da Ad Library: baixe antes com a skill `fb-ad-library-spy` e passe a pasta baixada.
 - Opções: `--lang en` (força idioma), `--interval 1.0` (mais quadros em vídeo de corte rápido), `--model medium`.
