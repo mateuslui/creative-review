@@ -5,6 +5,18 @@ transcrição com timestamp, leitura cena a cena, leitura estratégica e o "como
 
 ## Instalação
 
+### Jeito mais fácil: pedir para o Claude Code
+
+Com o Claude Code aberto no computador, mande:
+
+```
+Instala a skill do Creative Review seguindo o README de https://github.com/mateuslui/creative-review
+```
+
+Ele baixa a skill, instala o ffmpeg e monta o ambiente Python sozinho. Depois é só reiniciar o Claude Code.
+
+### Instalação manual
+
 Precisa do **Claude Code** instalado no computador. A skill roda comando local (ffmpeg, Whisper) e lê arquivo
 no disco, então não funciona no Claude do navegador nem no app de celular.
 
