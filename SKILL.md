@@ -90,6 +90,10 @@ pergunte: ela nasce da anterior? Marque toda quebra, com timestamp e a fala lite
 - personagem, voz, roupa ou cenário que muda de um plano pro outro sem a história pedir
 - queda de energia: bloco lento (veja "Ritmo por janela") logo depois de um bloco rápido
 
+A "duração enxuta" do `edicao.md` é o teto (fechar todo trecho sem fala), não a recomendação. Em drama,
+boa parte do tempo sem fala é ação ou cartela na tela que conta a história. O número que vai no veredito
+é o seu, somando só os cortes que você decidiu.
+
 Não confie na leitura por bloco: quebra de fluidez só aparece lendo linha a linha, e é exatamente o que
 uma revisão apressada deixa passar. Cada achado sai com **onde, o que está lá, por que quebra, o que
 fazer** (cortar de X a Y, encurtar, reordenar, escrever uma ponte). Feche com a duração atual, a duração

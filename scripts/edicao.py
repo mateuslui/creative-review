@@ -18,7 +18,7 @@ PAUSA_MIN = 0.8        # abaixo disso é respiro normal de fala
 GRAVE = 4.0            # trecho sem fala a partir daqui é grave
 RESPIRO = 0.4          # o que sobra de cada trecho depois do corte
 ABERTURA_MAX = 1.0     # fala tem que entrar até aqui
-MAX_QUADROS_GAP = 72
+MAX_QUADROS_GAP = 150
 
 
 def _mmss(t):
@@ -195,9 +195,11 @@ def analisar(video, wav, work, dur, cuts, segs, palavras, limite, grab, build_sh
     gap_dir, quadros = work / "gaps", []
     if trechos:
         (work / "gaps_frames").mkdir(exist_ok=True)
-        por_trecho = max(2, min(6, MAX_QUADROS_GAP // len(trechos)))
-        for x in trechos:
-            n = max(2, min(por_trecho, int(x["duracao"]) + 1))
+        # 1 quadro a cada ~1,5s do trecho (trecho longo ganha mais quadros), com teto no total
+        quer = [max(2, min(14, round(x["duracao"] / 1.5) + 1)) for x in trechos]
+        escala = min(1.0, MAX_QUADROS_GAP / sum(quer))
+        for x, q in zip(trechos, quer):
+            n = max(2, round(q * escala))
             for i in range(n):
                 tt = min(dur - 0.15, x["inicio"] + 0.2 + (x["duracao"] - 0.4) * i / (n - 1))
                 dest = work / "gaps_frames" / f"g_{tt:07.2f}s.jpg"
