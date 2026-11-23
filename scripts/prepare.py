@@ -7,9 +7,11 @@ Para cada vídeo gera, em <out>/<slug>/:
   transcript.md      "[MM:SS–MM:SS] fala" — uma linha por segmento
   hook/              quadros individuais de 0.0s a 3.0s (a cada 0.5s)
   sheets/            folhas 3x2 com timestamp em cada quadro (resto do vídeo)
+  edicao.md/.json    leitura de edição: trechos sem fala, buracos de áudio, repetição, volume, ritmo
+  gaps/              folhas com os quadros de dentro de cada trecho sem fala
 
 Uso:
-  python prepare.py <video|pasta|url> [...] --out <pasta> [--interval 1.5] [--model small]
+  python prepare.py <video|pasta|url> [...] --out <pasta> [--interval 1.5] [--model small] [--gap 1.5]
 """
 import argparse
 import json
@@ -130,21 +132,24 @@ def transcribe(video, work, model_name, lang):
     run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(video),
          "-vn", "-ac", "1", "-ar", "16000", str(wav)])
     if not wav.exists():
-        return None, []
+        return None, [], []
     try:
         from faster_whisper import WhisperModel
     except ImportError:
         print("[!] faster-whisper não instalado: sem transcrição", file=sys.stderr)
-        return None, []
+        return None, [], []
     if _model is None:
         _model = WhisperModel(model_name, device="cpu", compute_type="int8")
-    segs, info = _model.transcribe(str(wav), language=lang, vad_filter=True, beam_size=5)
-    out = [{"inicio": round(s.start, 2), "fim": round(s.end, 2), "texto": s.text.strip()} for s in segs]
-    wav.unlink(missing_ok=True)
-    return info.language, out
+    segs, info = _model.transcribe(str(wav), language=lang, vad_filter=True, beam_size=5, word_timestamps=True)
+    out, words = [], []
+    for s in segs:
+        out.append({"inicio": round(s.start, 2), "fim": round(s.end, 2), "texto": s.text.strip()})
+        words += [{"inicio": round(w.start, 2), "fim": round(w.end, 2), "texto": w.word.strip()}
+                  for w in (s.words or [])]
+    return info.language, out, words
 
 
-def process(video, out_root, interval, model_name, lang):
+def process(video, out_root, interval, model_name, lang, gap):
     slug = slugify(video.stem)
     work = out_root / slug
     work.mkdir(parents=True, exist_ok=True)
@@ -187,10 +192,29 @@ def process(video, out_root, interval, model_name, lang):
     sheets = build_sheets(frames, work / "sheets") if frames else []
 
     # Transcrição
-    language, segs = transcribe(video, work, model_name, lang) if meta["tem_audio"] else (None, [])
+    language, segs, words = transcribe(video, work, model_name, lang) if meta["tem_audio"] else (None, [], [])
     (work / "transcript.json").write_text(json.dumps(
-        {"idioma": language, "segmentos": segs}, ensure_ascii=False, indent=2))
-    lines = [f"[{mmss(s['inicio'])}–{mmss(s['fim'])}] {s['texto']}" for s in segs]
+        {"idioma": language, "segmentos": segs, "palavras": words}, ensure_ascii=False, indent=2))
+
+    # Edição e retenção: trechos sem fala, buracos de áudio, repetição, volume, ritmo
+    edicao, wav = None, work / "audio.wav"
+    if wav.exists():
+        try:
+            import edicao as ed
+            edicao = ed.analisar(video, wav, work, dur, cuts, segs, words, gap, grab, build_sheets)
+        except Exception as e:  # a leitura de copy não pode cair por causa desta etapa
+            print(f"[!] leitura de edição falhou: {e}", file=sys.stderr)
+        wav.unlink(missing_ok=True)
+
+    # Transcrição com os trechos sem fala marcados no lugar onde acontecem
+    marcas = sorted(edicao["trechos_sem_fala"], key=lambda x: x["inicio"]) if edicao else []
+    lines = [f"⏸ [{mmss(m['inicio'])}–{mmss(m['fim'])}] SEM FALA {m['duracao']}s ({m['audio']})"
+             for m in marcas if not segs or m["inicio"] < segs[0]["inicio"]]
+    for i, s in enumerate(segs):
+        lines.append(f"[{mmss(s['inicio'])}–{mmss(s['fim'])}] {s['texto']}")
+        prox = segs[i + 1]["inicio"] if i + 1 < len(segs) else float("inf")
+        lines += [f"⏸ [{mmss(m['inicio'])}–{mmss(m['fim'])}] SEM FALA {m['duracao']}s ({m['audio']})"
+                  for m in marcas if s["inicio"] <= m["inicio"] < prox]
     (work / "transcript.md").write_text("\n".join(lines) or "(sem fala detectada)")
 
     shots = [0.0] + cuts + [dur]
@@ -207,9 +231,21 @@ def process(video, out_root, interval, model_name, lang):
         "sheets": sheets,
         "transcript": str(work / "transcript.md"),
     })
+    if edicao:
+        meta.update({
+            "edicao": str(work / "edicao.md"),
+            "fala_pct": edicao["fala_pct"],
+            "trechos_sem_fala": len(edicao["trechos_sem_fala"]),
+            "tempo_recuperavel_s": edicao["tempo_recuperavel_s"],
+            "duracao_enxuta_s": edicao["duracao_enxuta_s"],
+            "folhas_dos_trechos_sem_fala": edicao["folhas_dos_trechos"],
+        })
     (work / "manifest.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2))
     print(f"    {dur}s | {meta['orientacao']} | {len(cuts)} cortes | plano médio {meta['duracao_media_plano_s']}s"
           f" | {len(hook)} hook + {len(sheets)} folhas | {len(segs)} segmentos de fala")
+    if edicao:
+        print(f"    edição: fala em {edicao['fala_pct']}% | {len(edicao['trechos_sem_fala'])} trecho(s) sem fala"
+              f" | {edicao['tempo_recuperavel_s']}s recuperáveis → {edicao['duracao_enxuta_s']}s")
     return meta
 
 
@@ -220,13 +256,15 @@ def main():
     ap.add_argument("--interval", type=float, default=1.5)
     ap.add_argument("--model", default="small")
     ap.add_argument("--lang", default=None, help="ex.: en, pt (padrão: autodetectar)")
+    ap.add_argument("--gap", type=float, default=1.5,
+                    help="segundos sem fala a partir dos quais o trecho entra na lista de corte (AI Drama: 1.0)")
     a = ap.parse_args()
     out_root = Path(a.out).expanduser()
     out_root.mkdir(parents=True, exist_ok=True)
     videos = collect_inputs(a.inputs, out_root / "_downloads")
     if not videos:
         sys.exit("Nenhum vídeo para processar.")
-    results = [process(v, out_root, a.interval, a.model, a.lang) for v in videos]
+    results = [process(v, out_root, a.interval, a.model, a.lang, a.gap) for v in videos]
     (out_root / "lote.json").write_text(json.dumps(results, ensure_ascii=False, indent=2))
     print(f"\nPronto: {len(results)} vídeo(s) em {out_root}")
 

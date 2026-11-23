@@ -3,6 +3,9 @@
 Skill do Claude Code que lê anúncios em vídeo (copy + visual) e devolve a leitura completa pra modelar:
 transcrição com timestamp, leitura cena a cena, leitura estratégica e o "como modelar".
 
+Também revisa a edição com foco em retenção: acha os trechos sem fala, os buracos de áudio, a fala repetida
+e as quebras de nexo, e devolve a lista de cortes com timestamp e a duração enxuta do vídeo.
+
 ## Instalação
 
 ### Jeito mais fácil: pedir para o Claude Code
@@ -96,6 +99,8 @@ Para cada vídeo, uma pasta com:
 - `transcript.md` — transcrição com timestamp
 - `hook/` — quadros de 0 a 3s, a cada 0,5s
 - `sheets/` — folhas de contato 3x2 com timestamp, uma por trecho e por corte de cena
+- `edicao.md` — trechos sem fala, buracos de áudio, fala repetida, salto de volume, ritmo por janela, duração enxuta
+- `gaps/` — quadros de dentro de cada trecho sem fala
 - `review.md` — a leitura final (escrita pelo Claude)
 
 Em lote, um `sintese.md` na raiz com os padrões que se repetem.
@@ -106,3 +111,9 @@ Em lote, um `sintese.md` na raiz com os padrões que se repetem.
 - `--interval 1.0` mais quadros, para vídeo de corte rápido
 - `--model medium` transcrição mais precisa e mais lenta
 - `--out <pasta>` define a pasta de saída
+- `--gap 1.5` segundos sem fala para o trecho entrar na lista de corte (AI Drama e unaware: `--gap 1.0`)
+
+## Crédito
+
+A medição de áudio da leitura de edição (curva de nível e queda total de som) segue o método do
+`earshot timeline`, de Leon Lin (https://github.com/Leonxlnx/earshot, MIT), reescrito com ffmpeg e numpy.

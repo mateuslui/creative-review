@@ -44,3 +44,26 @@
 **Lista de produção:** <quem filmar (perfil), cenas, takes, props, b-roll, textos na tela, estilo de legenda, duração alvo>
 
 **Atenção (Meta/EUA):** <claims, antes/depois, saúde, atributos pessoais — só se houver>
+
+## 5. Edição e retenção
+
+**Veredito:** <atual mm:ss> → <enxuto mm:ss> (−<x>%) · <n> cortes · fala em <x>% do tempo
+
+**Lista de cortes**
+
+| # | Tempo | Dur. | O que está lá | Por que quebra | O que fazer |
+|---|---|---|---|---|---|
+| 1 | 00:42.0–00:57.2 | 15,2s | <o que aparece nos quadros; áudio: silêncio / só trilha> | <sem fala e a imagem não anda a história> | Cortar de 00:42.0 a 00:56.8 |
+| ... | | | | | |
+
+**Trechos sem fala que ficam:** <tempo — o que a imagem entrega que justifica>
+
+**Quebras de nexo**
+
+| Tempo | Fala literal | O que quebra | Conserto |
+|---|---|---|---|
+| 01:14 | "<...>" | <salto sem ponte / referência sem antecedente / repetição / fala × imagem> | <cortar / reordenar / ponte: "<...>"> |
+
+**Ritmo e som:** <janelas lentas, plano longo, salto de volume, buraco de áudio — só o que existir>
+
+**Os 3 cortes que mais devolvem retenção:** <1> · <2> · <3>

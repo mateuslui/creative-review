@@ -39,3 +39,20 @@ no schema completo, leia esses dois arquivos no Obsidian e preencha o schema del
 - **Cenário:** casa/cozinha · consultório/lab · ar livre · estúdio · carro/selfie; iluminação pro → propositalmente amador
 - **Produto/CTA visual:** quando o produto aparece e como; botão/seta; preço, desconto, garantia na tela
 - **Qualitativo:** pararia no scroll? por quê · congruente com a página de destino?
+
+## Edição e retenção
+
+Régua: em ad de retenção (AI Drama, unaware de topo), cada segundo precisa de fala ou de imagem que faz a
+história andar. O que não faz nenhum dos dois é corte.
+
+- **Trecho sem fala:** fica (a imagem carrega: texto novo, revelação, reação, produto) × corta (enfeite, sobra
+  de plano depois da fala, imagem parada, trilha sozinha). Abertura: a fala entra em até 1s.
+- **Buraco de áudio:** fala, trilha e efeito caem juntos no meio do vídeo. Quase sempre emenda mal feita.
+- **Nexo:** salto sem ponte · referência sem antecedente · loop que não fecha · informação repetida ·
+  recomeço / frase cortada · fala × imagem desencontradas · legenda × fala · personagem, voz ou cenário
+  inconsistente entre planos.
+- **Ritmo:** janela "lenta" (palavras/min abaixo de 60% da mediana) · plano longo sem corte · queda de
+  energia depois de bloco rápido.
+- **Som:** salto de volume na fala de um trecho pro outro · trilha que some ou entra seca.
+- **Cada achado:** timestamp · o que está lá (fala literal ou o que aparece) · por que quebra · o que fazer.
+- **Fecho:** duração atual → duração enxuta · os 3 cortes que mais devolvem retenção.
